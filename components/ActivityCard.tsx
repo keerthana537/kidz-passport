@@ -1,18 +1,54 @@
-export default function ActivityCard({ activity }: { activity: any }) {
+interface Activity {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  rating: number;
+  category: string;
+  thumbnail: string;
+}
+
+interface Props {
+  activity: Activity;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
+  onClick: () => void;
+}
+
+export default function ActivityCard({
+  activity,
+  isFavorite,
+  onToggleFavorite,
+  onClick,
+}: Props) {
   return (
-    <div className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition p-4 bg-white">
-      <img 
-        src={activity.thumbnail || 'https://via.placeholder.com/150'} 
-        alt={activity.title} 
-        className="w-full h-48 object-cover rounded-md"
-      />
-      <div className="mt-4">
-        <h3 className="font-bold text-lg truncate">{activity.title}</h3>
-        <p className="text-gray-500 text-sm capitalize">{activity.category}</p>
-        <div className="flex justify-between items-center mt-4">
-          <span className="font-bold text-blue-600">${activity.price}</span>
-          <span className="text-yellow-500 text-sm">⭐ {activity.rating || 'N/A'}</span>
-        </div>
+    <div
+      className="bg-white rounded-3xl p-4 cursor-pointer
+      shadow-md hover:shadow-2xl hover:-translate-y-1
+      transition-all duration-300 border border-indigo-100"
+      onClick={onClick}
+    >
+      <img src={activity.thumbnail} className="rounded-2xl mb-4" />
+
+      <h3 className="font-bold">{activity.title}</h3>
+      <p className="text-sm font-semibold text-indigo-600 mb-2">
+        ${activity.price}
+      </p>
+
+      <div className="flex justify-between items-center">
+        <span>⭐ {activity.rating}</span>
+
+        <button
+          className="text-xl"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavorite();
+          }}
+        >
+          <span className={isFavorite ? "text-pink-500" : "text-slate-300"}>
+            {isFavorite ? "❤️" : "🤍"}
+          </span>
+        </button>
       </div>
     </div>
   );
