@@ -21,7 +21,7 @@ export default function Home() {
     const savedFavs = JSON.parse(localStorage.getItem('kidz_favs') || '[]');
     setFavorites(savedFavs);
 
-    // LIMIT FIXED TO 12 AS REQUESTED
+   
     fetch('https://dummyjson.com/products?limit=12')
       .then(res => res.json())
       .then(data => {
@@ -157,7 +157,7 @@ export default function Home() {
                 <p className="text-slate-500 text-sm font-medium leading-relaxed mb-8">{selected.description}</p>
                 <div className="flex items-center justify-between mb-10">
                   <span className="text-4xl font-black text-slate-900 tracking-tighter">${selected.price}</span>
-                  {/* N/A HANDLING FOR MODAL */}
+                 
                   <span className="bg-amber-400 text-amber-950 px-4 py-2 rounded-2xl font-black shadow-md">
                     ⭐ {selected.rating && selected.rating > 0 ? selected.rating : 'N/A'}
                   </span>
