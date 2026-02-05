@@ -13,14 +13,9 @@ interface Activity {
   thumbnail: string;
 }
 
-interface ApiResponse {
-  products: Activity[];
-}
-
 export default function Home() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [sort, setSort] = useState("rating");
@@ -30,23 +25,18 @@ export default function Home() {
   useEffect(() => {
     fetch("https://dummyjson.com/products?limit=12")
       .then((res) => res.json())
-      .then((data: ApiResponse) => {
+      .then((data) => {
         setActivities(data.products);
         setLoading(false);
       })
-      .catch(() => {
-        setError(true);
-        setLoading(false);
-      });
+      .catch(() => setLoading(false));
 
     const saved = localStorage.getItem("kidz-favs");
     if (saved) setFavorites(JSON.parse(saved));
   }, []);
 
   const toggleFavorite = (id: number) => {
-    const updated = favorites.includes(id)
-      ? favorites.filter((fav) => fav !== id)
-      : [...favorites, id];
+    const updated = favorites.includes(id) ? favorites.filter(f => f !== id) : [...favorites, id];
     setFavorites(updated);
     localStorage.setItem("kidz-favs", JSON.stringify(updated));
   };
@@ -67,45 +57,42 @@ export default function Home() {
 
   const categories = ["all", ...new Set(activities.map((a) => a.category))];
 
-  if (loading) return <div className="p-20 text-center font-bold">Loading...</div>;
+  if (loading) return <div className="p-20 text-center font-medium text-slate-400">Loading fine activities...</div>;
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-10 text-slate-900">
-      <div className="max-w-6xl mx-auto">
+    <main className="min-h-screen bg-white p-6 md:p-12 text-slate-900">
+      <div className="max-w-7xl mx-auto">
         
-        <header className="mb-10 text-center">
-          <h1 className="text-2xl md:text-4xl font-black tracking-tight mb-2
-          bg-gradient-to-r from-indigo-600 to-pink-500
-          text-transparent bg-clip-text uppercase italic">
-            KIDZ PASSPORT EXPLORER
-          </h1>
-          <p className="text-[10px] md:text-xs text-slate-400 font-bold tracking-[0.2em] uppercase">
-            Premium Kids Marketplace
-          </p>
+        {/* Sleeker Header */}
+        <header className="mb-12">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Kidz Passport</h1>
+          <p className="text-slate-500 text-sm">Discover and book the best activities for children.</p>
         </header>
 
-        
-        <div className="flex flex-col md:flex-row gap-3 mb-10">
-          <input
-            type="text"
-            placeholder="Search activities..."
-            className="flex-1 p-3 md:p-4 rounded-xl border border-slate-200 text-sm shadow-sm outline-none focus:ring-2 focus:ring-indigo-500"
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <div className="flex gap-2">
-            <select className="flex-1 md:w-32 p-3 md:p-4 rounded-xl bg-white border border-slate-200 text-sm outline-none" onChange={(e) => setCategory(e.target.value)}>
-              {categories.map(cat => <option key={cat} value={cat}>{cat.toUpperCase()}</option>)}
+        {/* Minimalist Filters */}
+        <div className="flex flex-col md:flex-row gap-4 mb-10 border-b border-slate-100 pb-8">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="Search destination or activity..."
+              className="w-full pl-4 pr-4 py-3 rounded-full border border-slate-200 text-sm focus:ring-2 focus:ring-slate-900 outline-none transition-all"
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-3">
+            <select className="p-3 px-6 rounded-full bg-slate-50 border-none text-xs font-bold uppercase tracking-wider outline-none cursor-pointer" onChange={(e) => setCategory(e.target.value)}>
+              {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </select>
-            <select className="flex-1 md:w-40 p-3 md:p-4 rounded-xl bg-white border border-slate-200 text-sm outline-none" onChange={(e) => setSort(e.target.value)}>
+            <select className="p-3 px-6 rounded-full bg-slate-50 border-none text-xs font-bold uppercase tracking-wider outline-none cursor-pointer" onChange={(e) => setSort(e.target.value)}>
               <option value="rating">Top Rated</option>
-              <option value="price-low">Price Low</option>
-              <option value="price-high">Price High</option>
+              <option value="price-low">Lowest Price</option>
+              <option value="price-high">Highest Price</option>
             </select>
           </div>
         </div>
 
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {/* Grid: 4 columns on desktop makes images smaller and cleaner */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
           {filteredActivities.map((activity) => (
             <ActivityCard
               key={activity.id}
@@ -117,29 +104,31 @@ export default function Home() {
           ))}
         </div>
 
-       
+        {/* Elegant Modal */}
         {selected && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-white w-full max-w-lg rounded-[40px] p-6 md:p-10 relative shadow-2xl animate-in zoom-in duration-200">
-              <button onClick={() => setSelected(null)} className="absolute top-6 right-6 w-10 h-10 bg-slate-100 rounded-full font-bold">✕</button>
+          <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white w-full max-w-2xl rounded-3xl p-8 relative shadow-2xl border border-slate-100 animate-in slide-in-from-bottom-4 duration-300">
+              <button onClick={() => setSelected(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-900 font-bold">Close ✕</button>
               
-              <div className="text-center">
-                
-                <div className="w-full h-48 md:h-64 flex items-center justify-center mb-6 bg-slate-50 rounded-3xl overflow-hidden">
-                  <img src={selected.thumbnail} alt="" className="max-h-full max-w-full object-contain p-4" />
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="bg-slate-50 rounded-2xl p-4 aspect-square flex items-center justify-center">
+                  <img src={selected.thumbnail} alt="" className="max-h-full object-contain" />
                 </div>
                 
-                <h2 className="text-xl md:text-2xl font-black mb-2 uppercase italic leading-tight">{selected.title}</h2>
-                <p className="text-slate-500 text-sm mb-8 leading-relaxed px-4">{selected.description}</p>
-                
-                <div className="flex justify-between items-center bg-slate-50 p-5 rounded-3xl mb-6">
-                  <span className="text-2xl font-black text-indigo-600">${selected.price}</span>
-                  <span className="font-bold text-slate-700">★ {selected.rating}</span>
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 mb-2 block">{selected.category}</span>
+                  <h2 className="text-2xl font-bold mb-4 leading-tight">{selected.title}</h2>
+                  <p className="text-slate-500 text-sm mb-8">{selected.description}</p>
+                  
+                  <div className="flex justify-between items-center mb-8 pb-8 border-b border-slate-100">
+                    <span className="text-3xl font-light">${selected.price}</span>
+                    <span className="text-sm font-bold">★ {selected.rating}</span>
+                  </div>
+                  
+                  <button className="w-full py-4 rounded-xl bg-slate-900 text-white font-bold hover:bg-indigo-600 transition-colors">
+                    Reserve Now
+                  </button>
                 </div>
-                
-                <button className="w-full py-4 rounded-2xl font-black bg-slate-900 text-white uppercase tracking-widest hover:bg-indigo-600 transition-all">
-                  Book Activity
-                </button>
               </div>
             </div>
           </div>
